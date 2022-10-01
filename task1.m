@@ -1,9 +1,9 @@
 clc
 clear all
-textLine1='r';
 fid = fopen('C:\Users\SHLT\Desktop\listData.txt','rt');
+textLine1 = fscanf(fid,'%s',1);
 while (strcmp(textLine1,'.')~=1)
-  textLine1 = fscanf(fid,'%s',1);
+%   textLine1 = fscanf(fid,'%s',1);
   textLine1(7)=lower(textLine1(7));
   textLine1(8)=lower(textLine1(8));
   aa=textLine1(1:5);
@@ -25,12 +25,13 @@ while (strcmp(textLine1,'.')~=1)
     outSigWav(i) = firCoef(1)*inpSigWavExt(i)+firCoef(2)*inpSigWavExt(i-1)+firCoef(3)*inpSigWavExt(i-2)+firCoef(4)*inpSigWavExt(i-3)+firCoef(5)*inpSigWavExt(i-4)+firCoef(6)*inpSigWavExt(i-5);
   end
   %定义滤波器的脉冲响应
-  figure;
-  plot([1001:1200],inpSigWav(1001:1200),'g',[1001:1200],outSigWav(1001:1200),'b'); 
-  grid; xlabel('Sample index'); ylabel('Amplitude');
-  legend('Input signal', 'Output signal')
+%   figure;
+%   plot([1001:1200],inpSigWav(1001:1200),'g',[1001:1200],outSigWav(1001:1200),'b'); 
+%   grid; xlabel('Sample index'); ylabel('Amplitude');
+%   legend('Input signal', 'Output signal')
 %   bb(1)=upper(bb(1));
 %   bb(2)=upper(bb(2));
   fileNameOut = strcat('C:\Users\SHLT\Desktop\wavFilt','\',aa,'\',bb);
   audiowrite(fileNameOut, outSigWav, Fs);
+   textLine1 = fscanf(fid,'%s',1);
 end
