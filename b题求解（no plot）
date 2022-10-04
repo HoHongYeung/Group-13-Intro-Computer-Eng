@@ -1,0 +1,46 @@
+clear all
+
+fid=fopen('listData.txt','rt');
+textCol1 = fscanf(fid,'%s',1);
+while (strcmp(textCol1,'.')~=1)   %While the content of column 1 is not '.'
+  save_path1='E:\matlab\LMexercise\labels\';
+  content1='textLine1(1:5).textLine1(7:end)';
+  save_path2='E:\matlab\LMexercise\wavOrig\';
+  content2='textLine1(1:6).textLine1(7:8).textLine1(9:end)';
+  cell_str=strsplit(content2,'.'); 
+  fileName1=strcat(save_path1,textCol1(1:end),'.lab');
+  fidnew=fopen(fileName1);
+  lab1=fscanf(fidnew,'%s',1);
+  lab2=fscanf(fidnew,'%s',1);
+  lab3aa=fscanf(fidnew,'%s',1);
+  if(strcmp(lab3aa,'aa')~=1)
+     
+      timeSegStart_ms=lab1+(lab2-lab1)/2-12.5;
+      timeSegEnd_ms=lab2-((lab2-lab1)/2-12.5);
+
+
+  endtr=textCol1(7:8);
+  if endtr>='A' & endtr<='Z'
+        endtrs=lower(endtr);
+  end
+
+      fileName2=strcat(save_path2,textCol1(1:6),endtrs,textCol1(9:end),'.wav');
+      [inpSigWav,Fs]=audioread(fileName2);
+      starpoint1=round(timeSegStart_ms*10^(-4)/(1/8000));
+      endpoint1=round(timeSegEnd_ms*10^(-4)/(1/8000));
+      %signlength=length(inpSigWav(starpoint:endpoint));
+      segOrig_phaa=inpSigWav(starpoint1:endpoint1);
+  end
+  if (strcmp(lab3aa,'s')~=1)
+      
+      timeSegStart_ms=lab1+(lab2-lab1)/2-12.5;
+      timeSegEnd_ms=lab2-((lab2-lab1)/2-12.5);
+      fileName3=strcat(save_path2,textCol1(1:6),endtrs,textCol1(9:end),'.wav');
+      [inpSigWav,Fs]=audioread(fileName3);
+      starpoint2=round(timeSegStart_ms*10^(-4)/(1/8000));
+      endpoint2=round(timeSegEnd_ms*10^(-4)/(1/8000));
+      %signlength=length(inpSigWav(starpoint:endpoint));
+      segOrig_phs=inpSigWav(starpoint2:endpoint2);
+  end
+  textline1=fscanf(fid,'%s',1);
+end
