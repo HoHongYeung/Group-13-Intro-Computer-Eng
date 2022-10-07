@@ -1,0 +1,64 @@
+clear;
+fid=fopen('listData.txt','rt');
+fileName=fscanf(fid,'%s',1);
+segOrigphAA=[];
+segOrighS=[];
+
+while(strcmp(fileName,'.')~=1)
+    orig_fileName=insertAfter(fileName,fileName,'.wav');
+    orig_fileName=insertBefore(orig_fileName,orig_fileName,'WavOrig\');
+    [inpSigWav,Fs]=audioread(orig_fileName);
+    lab_fileName=insertAfter(fileName,fileName,'.lab');
+    lab_fileName=insertBefore(lab_fileName,lab_fileName,'labels\');
+    lab_file=fopen(lab_fileName,'rt');
+    textCol=textscan(lab_file,'%f %f %s');
+    n=0;
+    m=0;
+    for i=1:size(textCol{3})
+        if(strcmp(textCol{3}(i),'aa')==1)
+            timePhStart=textCol{1}(i);
+            timePhEnd=textCol{2}(i);
+            timeSegStart_ms=timePhStart/10000+(timePhEnd/10000-timePhStart/10000)/2-12.5;
+            timeSegEnd_ms=timeSegStart_ms+25;
+            sampleIndex_start=round(timeSegStart_ms/(1000/Fs));
+            sampleIndex_end=round(timeSegEnd_ms/(1000/Fs));
+            aa_sig=reshape(inpSigWav(sampleIndex_start:sampleIndex_end),1,sampleIndex_end-sampleIndex_start+1);
+            segOrigphAA=[segOrigphAA;aa_sig];
+            if(strcmp(orig_fileName,'WavOrig\MDPK0\SA1.wav')==1)
+                n=n+1;
+                sampleIndex_start_aa(n)=sampleIndex_start;
+                sampleIndex_end_aa(n)=sampleIndex_end;
+            end
+        end
+        if(strcmp(textCol{3}(i),'s')==1)
+            timePhStart=textCol{1}(i);
+            timePhEnd=textCol{2}(i);
+            timeSegStart_ms=timePhStart/10000+(timePhEnd/10000-timePhStart/10000)/2-12.5;
+            timeSegEnd_ms=timeSegStart_ms+25;
+            sampleIndex_start=round(timeSegStart_ms/(1000/Fs));
+            sampleIndex_end=round(timeSegEnd_ms/(1000/Fs));
+            s_sig=reshape(inpSigWav(sampleIndex_start:sampleIndex_end),1,sampleIndex_end-sampleIndex_start+1);
+            segOrigphS=[segOrighS;s_sig];
+            if(strcmp(orig_fileName,'wavOrig\MDPK0\SA1.wav')==1)
+                m=m+1;
+                sampleIndex_start_s(m)=sampleIndex_start;
+                sampleIndex_end_s(m)=sampleIndex_end;
+            end
+        end
+    end
+    fclose('all');
+    fileName=fscanf(fid,'%s',1);
+end
+orig_fileName='wavOrig/MDPK0/SA1.wav';
+
+[inpSigWav,Fs]=audioread(orig_fileName);
+figure;
+plot([sampleIndex_start_aa(1):sampleIndex_end_aa(1)],inpSigwav(sampleIndex_start_aa(1):sampleIndex_end_aa(1)),'b');
+grid;xlabel('Sample index');ylabel('Amplitude');
+figure;
+plot([sampleIndex_start_s(1):sampleIndex_end_s(1)],inpSigWav(sampleIndex_start_s(1):sampleIndex_end_s(1)),'r');
+grid;xlabel('Sample index');ylabel('Amplitude');
+
+fclose(fid);
+save('segAllData.mat','segAllData.mat','segOrigphAA');
+
