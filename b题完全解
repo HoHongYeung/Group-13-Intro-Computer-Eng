@@ -60,5 +60,5 @@ plot([sampleIndex_start_s(1):sampleIndex_end_s(1)],inpSigWav(sampleIndex_start_s
 grid;xlabel('Sample index');ylabel('Amplitude');
 
 fclose(fid);
-save('segAllData.mat','segAllData.mat','segOrigphAA');
+save('segAllData.mat','segOrigphS','segOrigphAA');
 
