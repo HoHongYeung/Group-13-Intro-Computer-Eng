@@ -3,7 +3,7 @@ disp('Welcome to a text-based menu-driven program for analysis of a given set of
 disp('Press a -- Perform FIR filtering');
 disp('Press b -- Extraction of signal segments');
 disp('Press c -- Calculate the average energy for specified frequency regions');
-disp('Press b -- Modelling of the energy values using Gaussian PDF');
+disp('Press d -- Modelling of the energy values using Gaussian PDF');
 disp('Press e -- Exit the program');
 strResponse = input('Please make your choice: ', 's');
 while (strcmp(strResponse,'e')~=1)
