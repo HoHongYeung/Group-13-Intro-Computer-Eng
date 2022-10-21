@@ -9,84 +9,44 @@ while (strcmp(strResponse,'e')~=1)
     switch (strResponse)
         case 'a'
           clear;
-            fid = fopen('listData.txt','rt');
-            ind=0;            
-            % Read the column(column 1)
-            textCol1 = fscanf(fid,'%s',1);
-            while (strcmp(textCol1,'.')~=1)%While the content of column 1 is not '.'
-                ind = ind+1;
-                save_path='wavOrig\';
-                content='textLine1(1:6).textLine1(7:8).textLine1(9:end)';
-                cell_str=strsplit(content,'.');
-                entre=textCol1(7:8);
-                if entre>='A' & entre<='Z'
-                    lcl=lower(entre);
-                end        
-                sep_name=cell_str{1,1};
-                newname=strcat(save_path,textCol1(1:6),lcl,textCol1(9:end),'.wav');
-                
-                % Store the data into a structure array
-                storeDataStruct(ind).name = newname;              
-                
-                [inpSigWav,Fs] = audioread(newname);%  Load the input signal
-                nSamples = length(inpSigWav);
-                
-                %  Define the FIR filter coefficients
-                firCoef = [-0.08,0.24,0.4,0.4,0.16,-0.24,0.08];
-                nCoef = length(firCoef);
-                
-                %  Add zero samples to the beginning and to the end of the input signal to take account of the filter length
-                inpSigWavExt = [zeros(1,1); inpSigWav; zeros(1,1)];
-                nSamplesNew = length(inpSigWavExt);
-                
-                %  Allocate memory for the output signal
-                outSigWav = zeros(nSamplesNew,1);
-                
-                %  Perform filtering
-                for i=nCoef:nSamplesNew,
-                    outSigWav(i) = firCoef(1)*inpSigWavExt(i)+firCoef(2)*inpSigWavExt(i-1)+firCoef(3)*inpSigWavExt(i-2)+firCoef(4)*inpSigWavExt(i-3)+firCoef(5)*inpSigWavExt(i-4)+firCoef(6)*inpSigWavExt(i-5)+firCoef(7)*inpSigWavExt(i-6);
-                end
-                outSigWav=outSigWav(7:end-6);%Should it be?
-                
-                
-                %  Store the output signal into .wav file
-                fileNameOut = strcat('wavFilt\',textCol1(1:6),lcl,textCol1(9:end),'.wav');
-                audiowrite(fileNameOut, outSigWav, Fs);
-                if (strcmp(textCol1,'MCPM0\SA1')==1)%test
-                    x=outSigWav;
-                end
-                
-                % Read column 1 - next row
-                textCol1 = fscanf(fid,'%s',1);
-            end
-
-            %  Define the FIR filter coefficients
-            firCoef = [-0.08,0.24,0.4,0.4,0.16,-0.24,0.08];
-            impres=[-0.08,0.24,0.4,0.4,0.16,-0.24,0.08,zeros(1, 249)];
-            nCoef = length(firCoef);
-            IMPRES=abs(fft(impres));
-            magIMPRES=20 * log10(IMPRES);
-            figure;
-            plot([0:127]*8000/256,magIMPRES(1:128));
-            grid; xlabel('Frequncy'); ylabel('Amplitude[db]');
-            
-            fileNameOrig = 'wavOrig\MCPM0\sa1.wav';
-            [inpSigWav,Fs] = audioread(fileNameOrig);%  Load the input signal
-            
-            fileNameFilt = 'wavFilt\MCPM0\sa1.wav';
-            [outSigWav,Fs] = audioread(fileNameFilt);%  Load the output signal
-            
-            figure;
-            plot([1 : 401], inpSigWav(1900:2300),'r',[1 : 401],outSigWav(1900:2300),'g');
-            % plot([1900 : 2300], x(1900:2300),'r',[1900 : 2300],outSigWav(1900:2300),'g');            
-            grid; xlabel('Index'); ylabel('Amplitude');
-            legend('Input signal', 'Output signal')
-            
-            %test
-            % y=x(7:24377);
-            % z=filter(firCoef,1,inpSigWav);
-            
-            fclose(fid);
+      fid=fopen('listData.txt','rt');
+      index1=0;
+      textline=fscanf(fid,'%s',1);
+      while(strcmp(textline,'.')~=1)
+        index1=index1+1;
+        structData{index1}=textline;
+        textline=fscanf(fid,'%s',1); %use a loop to operate and then store data
+      end
+      fclose(fid);
+      index2=1;
+      while index2<(51)      
+        m=structData(:,index2);
+        wavname=['wavOrig/',m,'.wav']; %use every line as the route of wavfile
+        name=strcat(wavname(1),wavname(2),wavname(3));
+        c=cell2mat(name);
+        [inpsigwav,Fs]=audioread(c);
+        nSamples=length(inpsigwav);
+        firCoef=[-0.7,-0.9,-0.9,0.7,0.5,0.3,0.3];
+        nCoef=length(firCoef);
+        inpsigwav=[zeros(nCoef,1);inpsigwav;zeros(nCoef,1)];
+        nSamplesNew=length(inpsigwav);
+        outSigWav=zeros(nSamplesNew,1);
+        for d=1+nCoef:nSamples+nCoef
+            outSigWav(d)=firCoef(1)*inpsigwav(d)+firCoef(2)*inpsigwav(d-1)+firCoef(3)*inpsigwav(d-2)+firCoef(4)*inpsigwav(d-3)+firCoef(5)*inpsigwav(d-4)+firCoef(6)*inpsigwav(d-5)+firCoef(7)*inpsigwav(d-6);
+        end
+        filtName=['wavFilt/',m,'.wav'];
+        e=strcat(filtName(1),filtName(2),filtName(3));
+        filenameout=cell2mat(e);     %define the files that we want to put sampled wavfiles
+        audiowrite(filenameout,outSigWav,Fs);
+        index2=index2+1;
+      end
+      datacontents=[firCoef,zeros(1,249)];  
+      magFreqChar=abs(fft(datacontents));
+      magFreqChar_dB=20*log10(magFreqChar);  %convert to dB
+      figure;
+      plot([0:127]*Fs/256,magFreqChar_dB(1:128));
+      grid;
+      xlabel('Frequency(Hz)');ylabel('Amplitude(dB)')
 case 'b'
 clear all;
 clc;
@@ -389,3 +349,5 @@ case 'd'
     end
     strResponse = input('Please make your choice: ', 's');
 end
+
+   
